@@ -26,7 +26,7 @@ var _subnets = [
 // ============== //
 
 resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
-  name: 'test-vnet-01'
+  name: '${projectName}-vnet'
   location: location
   properties: {
     addressSpace: {
