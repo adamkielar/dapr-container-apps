@@ -1,0 +1,30 @@
+name: Trigger deployment of container apps infrastructure
+
+on:
+  push:
+    branches:
+      - main
+      - infra
+    paths:
+    - 'bicep/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+   runs-on: ubuntu-22.04
+   steps:
+    - name: Checkout code
+      uses: actions/checkout@infra
+    
+    - name: Log into Azure
+      uses: azure/login@1
+      with:
+       creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy Bicep file
+      uses: azure/arm-deploy@1
+      with:
+       resourceGroupName: dapr-containerapps-rg
+       template: bicep/main.bicep
+       parameters: bicep/container-apps.json
+       additionalArguments: "--what-if --rollback-on-error --what-if-exclude-change-types Create Ignore"
