@@ -14,7 +14,7 @@ jobs:
    runs-on: ubuntu-22.04
    steps:
     - name: Checkout code
-      uses: actions/checkout@infra
+      uses: actions/checkout@main
     
     - name: Log into Azure
       uses: azure/login@1
