@@ -18,7 +18,7 @@ jobs:
       uses: actions/checkout@main
     
     - name: Log into Azure
-      uses: azure/login@1
+      uses: azure/login@v1
       with:
        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
