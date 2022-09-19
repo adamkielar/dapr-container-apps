@@ -23,7 +23,7 @@ jobs:
        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Deploy Bicep file
-      uses: azure/arm-deploy@1
+      uses: azure/arm-deploy@v1
       with:
        resourceGroupName: dapr-containerapps-rg
        template: bicep/main.bicep
