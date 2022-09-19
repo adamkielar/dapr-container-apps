@@ -6,6 +6,7 @@ on:
       - main
       - infra
     paths:
+    - '.github/**'
     - 'bicep/**'
   workflow_dispatch:
 
