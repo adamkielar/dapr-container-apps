@@ -16,10 +16,6 @@ var _subnets = [
     name: 'runtime-snet'
     addressPrefix: '10.0.4.0/23'
   }
-  {
-    name: 'redis-snet'
-    addressPrefix: '10.0.6.0/26'
-  }
 ]
 
 // ============== //
@@ -48,7 +44,15 @@ var vnetSubnets = {
   'core-snet': vnet.properties.subnets[0].id
   'infrastructure-snet': vnet.properties.subnets[1].id
   'runtime-snet': vnet.properties.subnets[2].id
-  'redis-snet': vnet.properties.subnets[3].id
+}
+
+// ============== //
+// User-assigned Identity For Container Apps
+// ============== //
+
+resource appIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+  name: '${projectName}-id'
+  location: location
 }
 
 // ============== //
@@ -71,8 +75,58 @@ module privateEndpointAcr 'acr-privatelink.bicep' = {
   params: {
     privateEndpointName: '${projectName}-acr-pe'
     location: location
-    acrName: acr.name
+    acrId: acr.id
     subnetId: vnetSubnets['core-snet']
+  }
+}
+
+resource acrPullRole 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
+  name: guid(acr.name, 'AcrPull', appIdentity.id)
+  scope: acr
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
+    principalId: appIdentity.properties.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// ============== //
+// Key Vault
+// ============== //
+
+resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
+  name: '${projectName}-kv'
+  location: location
+  properties: {
+    tenantId: subscription().tenantId
+    sku: {
+      name: 'standard'
+      family: 'A'
+    }
+    enabledForTemplateDeployment: true
+    enableSoftDelete: false
+    softDeleteRetentionInDays: 7
+    enableRbacAuthorization: true
+  }
+}
+
+module privateEndpointKeyVault 'keyvault-privatelink.bicep' = {
+  name: '${_deployment}-kv-pe'
+  params: {
+    privateEndpointName: '${projectName}-kv-pe'
+    location: location
+    keyVaultId: keyVault.id
+    subnetId: vnetSubnets['core-snet']
+  }
+}
+
+resource kvSecretUserRole 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
+  name: guid(keyVault.name, 'Key Vault Secrets User', appIdentity.id)
+  scope: keyVault
+  properties: {
+    principalId: appIdentity.properties.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
   }
 }
 
@@ -96,13 +150,13 @@ resource redisCache 'Microsoft.Cache/redis@2022-05-01' = {
   }
 }
 
-module privateEndpointRedisCahce 'redis-privatelink.bicep' = {
+module privateEndpointRedisCache 'redis-privatelink.bicep' = {
   name: '${_deployment}-reids-pe'
   params: {
     privateEndpointName: '${projectName}-redis-pe'
     location: location
-    redisCacheName: redisCache.name
-    subnetId: vnetSubnets['redis-snet']
+    redisCacheId: redisCache.id
+    subnetId: vnetSubnets['core-snet']
   }
 }
 // ============== //

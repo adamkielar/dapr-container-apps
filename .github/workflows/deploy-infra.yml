@@ -30,7 +30,7 @@ jobs:
        parameters: bicep/container-apps.json
        additionalArguments: "--rollback-on-error"
 
-    - name: Azure CLI script
+    - name: Azure CLI cleanup
       uses: azure/CLI@v1
       with:
         inlineScript: |

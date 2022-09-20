@@ -1,6 +1,6 @@
 param privateEndpointName string
 param location string
-param redisCacheId string
+param keyVaultId string
 param subnetId string
 
 resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing = {
@@ -11,16 +11,16 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing = {
   }
 }
 
-resource redisCache 'Microsoft.Cache/redis@2022-05-01' existing = {
-  name: last(split(redisCacheId, '/'))
+resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
+  name: last(split(keyVaultId, '/'))
 }
 
 resource privateDns 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.redis.cache.windows.net'
+  name: 'privatelink.vaultcore.azure.net'
   location: 'global'
 
   resource virtualNetworkLinks 'virtualNetworkLinks' = {
-    name: uniqueString(vnet.id, redisCache.name)
+    name: uniqueString(vnet.id, keyVault.name)
     location: 'global'
     properties: {
       virtualNetwork: {
@@ -45,9 +45,9 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
       {
         name: privateEndpointName
         properties: {
-          privateLinkServiceId: redisCache.id
+          privateLinkServiceId: keyVault.id
           groupIds: [
-            'redisCache'
+            'vault'
           ]
         }
       }

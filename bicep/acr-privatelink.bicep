@@ -1,6 +1,6 @@
 param privateEndpointName string
 param location string
-param acrName string
+param acrId string
 param subnetId string
 
 resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing = {
@@ -12,7 +12,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing = {
 }
 
 resource acr 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
-  name: acrName
+  name: last(split(acrId, '/'))
 }
 
 resource privateDns 'Microsoft.Network/privateDnsZones@2020-06-01' = {
