@@ -93,7 +93,6 @@ resource redisCache 'Microsoft.Cache/redis@2022-05-01' = {
       family: 'C'
       name: 'Basic'
     }
-    subnetId: vnetSubnets['redis-snet']
   }
 }
 
