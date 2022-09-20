@@ -1,5 +1,6 @@
 param projectName string
 param location string = resourceGroup().location
+param serviceBusTopicName string
 
 var projectNameSafe = toLower(replace(projectName, '-', ''))
 var _deployment = deployment().name
@@ -130,6 +131,14 @@ resource kvSecretUserRole 'Microsoft.Authorization/roleAssignments@2020-08-01-pr
   }
 }
 
+module secrets 'keyvault-secrets.bicep' = {
+  name: '${_deployment}-kv-secrets'
+  params: {
+    keyVaultId: keyVault.id
+    serviceBusId: serviceBusNamespace.id
+    redisCacheId: redisCache.id
+  }
+}
 // ============== //
 // Redis Cache
 // ============== //
@@ -163,13 +172,24 @@ module privateEndpointRedisCache 'redis-privatelink.bicep' = {
 // ============== //
 // Service Bus
 // ============== //
-resource serviceBus 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
+resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
   name: '${projectName}-sbn'
   location: location
   sku: {
     name: 'Standard'
   }
   properties: {}
+
+  resource topic 'topics' = {
+    name: serviceBusTopicName
+    properties: {
+      maxSizeInMegabytes: 1024
+      defaultMessageTimeToLive: 'P10D'
+      supportOrdering: true
+      duplicateDetectionHistoryTimeWindow: 'P10D'
+      requiresDuplicateDetection: false
+    }
+  }
 
   resource sharedAccessKey 'AuthorizationRules' = {
     name: 'DefaultAuthorizationRule'

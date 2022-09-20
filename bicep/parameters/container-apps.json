@@ -4,6 +4,9 @@
   "parameters": {
     "projectName": {
       "value": "dapr-containerapp"
+    },
+    "serviceBusTopicName": {
+      "value": "checkout"
     }
   }
 }
