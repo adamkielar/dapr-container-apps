@@ -159,6 +159,29 @@ module privateEndpointRedisCache 'redis-privatelink.bicep' = {
     subnetId: vnetSubnets['core-snet']
   }
 }
+
+// ============== //
+// Service Bus
+// ============== //
+resource serviceBus 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
+  name: '${projectName}-sbn'
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {}
+
+  resource sharedAccessKey 'AuthorizationRules' = {
+    name: 'DefaultAuthorizationRule'
+    properties: {
+      rights: [
+        'Listen'
+        'Send'
+      ]
+    }
+  }
+}
+
 // ============== //
 // Container App Environment
 // ============== //
