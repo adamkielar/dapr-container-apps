@@ -1,6 +1,7 @@
 param projectName string
 param location string = resourceGroup().location
 
+var projectNameSafe = toLower(replace(projectName, '-', ''))
 var _deployment = deployment().name
 var _subnets = [
   {
@@ -43,14 +44,49 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
   }
 }
 
+var vnetSubnets = {
+  'core-snet': vnet.properties.subnets[0].id
+  'infrastructure-snet': vnet.properties.subnets[1].id
+  'runtime-snet': vnet.properties.subnets[2].id
+  'redis-snet': vnet.properties.subnets[3].id
+}
+
+// ============== //
+// ACR
+// ============== //
+resource acr 'Microsoft.ContainerRegistry/registries@2019-05-01' = {
+  name: '${projectNameSafe}acr'
+  location: location
+  sku: {
+    name: 'Basic'
+  }
+  properties: {
+    adminUserEnabled: false
+  }
+}
+
+module privateEndpointAcr 'acr-privatelink.bicep' = {
+  name: '${_deployment}-acr-pe'
+  params: {
+    privateEndpointName: '${projectName}-acr-pe'
+    location: location
+    acrName: acr.name
+    subnetId: vnetSubnets['core-snet']
+  }
+}
+
+// ============== //
+// Container App Environment
+// ============== //
+
 module containerAppsEnvironment 'environment.bicep' = {
   name: '${_deployment}-env'
   params: {
     projectName: projectName
     location: location
     vnet: {
-      infrastructureSubnetId: vnet.properties.subnets[1].id
-      runtimeSubnetId: vnet.properties.subnets[2].id
+      infrastructureSubnetId: vnetSubnets['infrastructure-snet']
+      runtimeSubnetId: vnetSubnets['runtime-snet']
     }
   }
 }
