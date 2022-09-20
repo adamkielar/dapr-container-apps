@@ -54,11 +54,12 @@ var vnetSubnets = {
 // ============== //
 // ACR
 // ============== //
+
 resource acr 'Microsoft.ContainerRegistry/registries@2019-05-01' = {
   name: '${projectNameSafe}acr'
   location: location
   sku: {
-    name: 'Basic'
+    name: 'Premium'
   }
   properties: {
     adminUserEnabled: false
@@ -75,6 +76,36 @@ module privateEndpointAcr 'acr-privatelink.bicep' = {
   }
 }
 
+// ============== //
+// Redis Cache
+// ============== //
+
+resource redisCache 'Microsoft.Cache/redis@2022-05-01' = {
+  name: '${projectName}-redis'
+  location: location
+  properties: {
+    enableNonSslPort: false
+    minimumTlsVersion: '1.2'
+    publicNetworkAccess: 'Disabled'
+    redisVersion: '6'
+    sku: {
+      capacity: 0
+      family: 'C'
+      name: 'Basic'
+    }
+    subnetId: vnetSubnets['redis-snet']
+  }
+}
+
+module privateEndpointRedisCahce 'redis-privatelink.bicep' = {
+  name: '${_deployment}-reids-pe'
+  params: {
+    privateEndpointName: '${projectName}-redis-pe'
+    location: location
+    redisCacheName: redisCache.name
+    subnetId: vnetSubnets['redis-snet']
+  }
+}
 // ============== //
 // Container App Environment
 // ============== //
