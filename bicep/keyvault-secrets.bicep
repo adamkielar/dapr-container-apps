@@ -19,5 +19,22 @@ resource redisCache 'Microsoft.Cache/redis@2022-05-01' existing = {
 resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
   name: last(split(keyVaultId, '/'))
 
-  
+  resource secretServiceBusPrimaryKey 'secrets' = {
+    name: 'serviceBusKey'
+    properties: {
+      value: serviceBus::sharedAccessKey.listKeys().primaryKey
+    }
+  }
+  resource secretServiceBusConnectionString 'secrets' = {
+    name: 'serviceBusConnectionString'
+    properties: {
+      value: serviceBus::sharedAccessKey.listKeys().primaryConnectionString
+    }
+  }
+  resource secretRedisCachePrimaryKey 'secrets' = {
+    name: 'redisCacheKey'
+    properties: {
+      value: redisCache.properties.accessKeys.primaryKey
+    }
+  }
 }
