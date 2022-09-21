@@ -180,17 +180,6 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
   }
   properties: {}
 
-  resource topic 'topics' = {
-    name: serviceBusTopicName
-    properties: {
-      maxSizeInMegabytes: 1024
-      defaultMessageTimeToLive: 'P10D'
-      supportOrdering: true
-      duplicateDetectionHistoryTimeWindow: 'P10D'
-      requiresDuplicateDetection: false
-    }
-  }
-
   resource sharedAccessKey 'AuthorizationRules' = {
     name: 'DefaultAuthorizationRule'
     properties: {
@@ -199,6 +188,18 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
         'Send'
       ]
     }
+  }
+}
+
+resource topic 'Microsoft.ServiceBus/namespaces/topics@2021-11-01' = {
+  parent: serviceBusNamespace
+  name: serviceBusTopicName
+  properties: {
+    maxSizeInMegabytes: 1024
+    defaultMessageTimeToLive: 'P10D'
+    supportOrdering: true
+    duplicateDetectionHistoryTimeWindow: 'P10D'
+    requiresDuplicateDetection: false
   }
 }
 

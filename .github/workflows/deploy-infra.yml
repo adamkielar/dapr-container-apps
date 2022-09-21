@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-    - 'bicep/**'
+    - 'bicep/infra/**'
     - '.github/workflows/deploy-infra.yml'
   workflow_dispatch:
 
