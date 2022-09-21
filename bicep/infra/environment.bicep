@@ -69,22 +69,22 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01'
       initTimeout: '5s'
       secrets: [
         {
-          name: 'redisCacheKey'
+          name: 'redis-cache-key'
           value: redisCacheKey
         }
         {
-          name: 'redisCacheHost'
+          name: 'redis-cache-host'
           value: redisCacheHost
         }
       ]
       metadata: [
         {
           name: 'redisHost'
-          secretRef: 'redisCacheHost'
+          secretRef: 'redis-cache-host'
         }
         {
           name: 'redisPassword'
-          secretRef: 'redisCacheKey'
+          secretRef: 'redis-cache-key'
         }
         {
           name: 'actorStateStore'
