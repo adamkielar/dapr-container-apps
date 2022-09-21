@@ -1,12 +1,10 @@
 name: Trigger deployment of container apps infrastructure
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
     paths:
     - 'bicep/infra/**'
-    - '.github/workflows/deploy-infra.yml'
+    - '.github/workflows/deploy-infra.yml' 
   workflow_dispatch:
 
 jobs:

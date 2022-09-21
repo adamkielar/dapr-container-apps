@@ -1,0 +1,17 @@
+name: Main deployment workflow
+
+on:
+  push:
+    branches:
+      - main
+      - python-app
+  workflow_dispatch:
+   
+jobs:
+  deploy-infra:
+   uses: './.github/workflows/deploy-infra.yml'
+   secrets: inherit
+
+  deploy-python-receiver:
+   uses: './.github/workflows/deploy-python-receiver.yml'
+   secrets: inherit

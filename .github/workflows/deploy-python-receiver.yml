@@ -1,7 +1,7 @@
 name: Trigger deployment of python-receiver application
 
 on:
-  push:
+  workflow_call:
     paths:
     - 'python-receiver/**'
     - '.github/workflows/deploy-python-receiver.yml'
@@ -10,7 +10,6 @@ on:
 jobs:
   build-and-push-to-acr:
     runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/python-app'
     steps:
         - name: Checkout code
           uses: actions/checkout@v2
@@ -46,8 +45,12 @@ jobs:
         with:
           resourceGroupName: dapr-containerapps-rg
           template: bicep/apps/container-app.bicep
-          parameters: containerAppName=python-receiver containerImage=${{ secrets.ACR_SERVER }}/python-receiver:${{ github.sha }} acrServer=${{ secrets.ACR_SERVER }} containerPort=6000
-          additionalArguments: "--rollback-on-error"
+          parameters: |
+            containerAppName=python-receiver 
+            containerImage=${{ secrets.ACR_SERVER }}/python-receiver:${{ github.sha }} 
+            acrServer=${{ secrets.ACR_SERVER }} 
+            containerPort=6000
+            externalIngressEnabled=true 
 
       - name: Azure CLI script
         uses: azure/CLI@v1
