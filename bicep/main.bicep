@@ -160,7 +160,7 @@ resource redisCache 'Microsoft.Cache/redis@2022-05-01' = {
 }
 
 module privateEndpointRedisCache 'redis-privatelink.bicep' = {
-  name: '${_deployment}-reids-pe'
+  name: '${_deployment}-redis-pe'
   params: {
     privateEndpointName: '${projectName}-redis-pe'
     location: location
