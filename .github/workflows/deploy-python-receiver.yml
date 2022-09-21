@@ -4,7 +4,7 @@ on:
   push:
     paths:
     - 'python-receiver/**'
-    - '.github/workflows/deploy-infra.yml'
+    - '.github/workflows/deploy-python-receiver.yml'
   workflow_dispatch:
    
 jobs:
