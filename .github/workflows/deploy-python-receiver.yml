@@ -1,7 +1,7 @@
 name: Trigger deployment of python-receiver application
 
 on:
-  workflow_call:
+  push:
     paths:
     - 'python-receiver/**'
     - '.github/workflows/deploy-python-receiver.yml'
@@ -50,7 +50,7 @@ jobs:
             containerImage=${{ secrets.ACR_SERVER }}/python-receiver:${{ github.sha }} 
             acrServer=${{ secrets.ACR_SERVER }} 
             containerPort=6000
-            externalIngressEnabled=true 
+            externalIngressEnabled=true
 
       - name: Azure CLI script
         uses: azure/CLI@v1
