@@ -33,6 +33,9 @@ jobs:
     runs-on: ubuntu-22.04
     needs: build-and-push-to-acr
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Azure Login
         uses: azure/login@v1
         with:
