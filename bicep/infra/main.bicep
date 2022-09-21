@@ -196,10 +196,13 @@ resource topic 'Microsoft.ServiceBus/namespaces/topics@2021-11-01' = {
   name: serviceBusTopicName
   properties: {
     maxSizeInMegabytes: 1024
-    defaultMessageTimeToLive: 'P10D'
     supportOrdering: true
-    duplicateDetectionHistoryTimeWindow: 'P10D'
+    duplicateDetectionHistoryTimeWindow: 'PT10M'
     requiresDuplicateDetection: false
+  }
+  resource subs 'subscriptions' = {
+    name: '${serviceBusTopicName}-sub'
+    properties: {}
   }
 }
 
@@ -208,9 +211,14 @@ resource topic 'Microsoft.ServiceBus/namespaces/topics@2021-11-01' = {
 // ============== //
 
 module containerAppsEnvironment 'environment.bicep' = {
+  dependsOn: [
+    secrets
+  ]
   name: '${_deployment}-env'
   params: {
     projectName: projectName
+    redisCacheKey: keyVault.getSecret('redisCacheKey')
+    secretRedisCacheHost: keyVault.getSecret('secretRedisCacheHost')
     location: location
     vnet: {
       infrastructureSubnetId: vnetSubnets['infrastructure-snet']

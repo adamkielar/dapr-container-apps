@@ -1,9 +1,15 @@
 param projectName string
 param location string
+param pythonReceiverApp string = 'python-receiver'
 param logName string = '${projectName}-logs'
 param envName string = '${projectName}-env'
 param appInsightsName string = '${projectName}-ai'
 param vnet object
+
+@secure()
+param redisCacheKey string
+@secure()
+param secretRedisCacheHost string
 
 // ============== //
 // Log Analytics
@@ -48,10 +54,46 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01'
     vnetConfiguration: {
       dockerBridgeCidr: '100.64.0.1/16'
       infrastructureSubnetId: vnet.infrastructureSubnetId
-      internal: true
+      internal: false
       platformReservedCidr: '198.18.0.0/16'
       platformReservedDnsIP: '198.18.0.10'
       runtimeSubnetId: vnet.runtimeSubnetId
+    }
+  }
+  resource daprComponent 'daprComponents' = {
+    name: 'statestore'
+    properties: {
+      componentType: 'state.redis'
+      version: 'v1'
+      ignoreErrors: false
+      initTimeout: '5s'
+      secrets: [
+        {
+          name: 'redisCacheKey'
+          value: redisCacheKey
+        }
+        {
+          name: 'secretRedisCacheHost'
+          value: secretRedisCacheHost
+        }
+      ]
+      metadata: [
+        {
+          name: 'redisHost'
+          secretRef: 'secretRedisCacheHost'
+        }
+        {
+          name: 'redisPassword'
+          secretRef: 'redisCacheKey'
+        }
+        {
+          name: 'actorStateStore'
+          value: 'true'
+        }
+      ]
+      scopes: [
+        pythonReceiverApp
+      ]
     }
   }
 }
