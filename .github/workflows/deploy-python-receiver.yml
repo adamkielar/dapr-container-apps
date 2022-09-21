@@ -1,4 +1,6 @@
 name: Trigger deployment of python-receiver application
+concurrency: 
+  group: ${{ github.head_ref || github.run_id }}
 
 on:
   push:
@@ -45,12 +47,7 @@ jobs:
         with:
           resourceGroupName: dapr-containerapps-rg
           template: bicep/apps/container-app.bicep
-          parameters: |
-            containerAppName=python-receiver 
-            containerImage=${{ secrets.ACR_SERVER }}/python-receiver:${{ github.sha }} 
-            acrServer=${{ secrets.ACR_SERVER }} 
-            containerPort=6000
-            externalIngressEnabled=true
+          parameters: containerAppName=python-receiver containerImage=${{ secrets.ACR_SERVER }}/python-receiver:${{ github.sha }} acrServer=${{ secrets.ACR_SERVER }} containerPort=6000 externalIngressEnabled=true
 
       - name: Azure CLI script
         uses: azure/CLI@v1
