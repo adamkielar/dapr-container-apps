@@ -1,10 +1,10 @@
 param projectName string = 'dapr-containerapp'
-param acrServer string = 'daprcontainerappacr.azurecr.io'
+param acrServer string
 param containerAppName string
 param externalIngressEnabled bool = false
 param containerImage string
 param containerPort int
-param location string
+param location string = resourceGroup().location
 
 
 resource appIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' existing = {

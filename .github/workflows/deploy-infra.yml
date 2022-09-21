@@ -25,8 +25,8 @@ jobs:
       uses: azure/arm-deploy@v1
       with:
        resourceGroupName: dapr-containerapps-rg
-       template: bicep/main.bicep
-       parameters: bicep/parameters/container-apps.json
+       template: bicep/infra/main.bicep
+       parameters: bicep/infra/parameters/container-apps.json
        additionalArguments: "--what-if"
 
     - name: Approve deployment
@@ -39,8 +39,8 @@ jobs:
       uses: azure/arm-deploy@v1
       with:
        resourceGroupName: dapr-containerapps-rg
-       template: bicep/main.bicep
-       parameters: bicep/parameters/container-apps.json
+       template: bicep/infra/main.bicep
+       parameters: bicep/infra/parameters/container-apps.json
        additionalArguments: "--rollback-on-error"
 
     - name: Azure CLI cleanup
