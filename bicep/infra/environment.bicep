@@ -9,7 +9,7 @@ param vnet object
 @secure()
 param redisCacheKey string
 @secure()
-param secretRedisCacheHost string
+param redisCacheHost string
 
 // ============== //
 // Log Analytics
@@ -73,14 +73,14 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01'
           value: redisCacheKey
         }
         {
-          name: 'secretRedisCacheHost'
-          value: secretRedisCacheHost
+          name: 'redisCacheHost'
+          value: redisCacheHost
         }
       ]
       metadata: [
         {
           name: 'redisHost'
-          secretRef: 'secretRedisCacheHost'
+          secretRef: 'redisCacheHost'
         }
         {
           name: 'redisPassword'

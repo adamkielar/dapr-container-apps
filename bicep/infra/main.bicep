@@ -218,7 +218,7 @@ module containerAppsEnvironment 'environment.bicep' = {
   params: {
     projectName: projectName
     redisCacheKey: keyVault.getSecret('redisCacheKey')
-    secretRedisCacheHost: keyVault.getSecret('secretRedisCacheHost')
+    redisCacheHost: keyVault.getSecret('redisCacheHost')
     location: location
     vnet: {
       infrastructureSubnetId: vnetSubnets['infrastructure-snet']

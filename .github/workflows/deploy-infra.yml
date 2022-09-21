@@ -29,11 +29,11 @@ jobs:
        parameters: bicep/infra/parameters/container-apps.json
        additionalArguments: "--what-if"
 
-    - name: Approve deployment
-      uses: trstringer/manual-approval@v1
-      with:
-        secret: ${{ github.TOKEN }}
-        approvers: adamkielar
+    # - name: Approve deployment
+    #   uses: trstringer/manual-approval@v1
+    #   with:
+    #     secret: ${{ github.TOKEN }}
+    #     approvers: adamkielar
 
     - name: Deploy Bicep file
       uses: azure/arm-deploy@v1
