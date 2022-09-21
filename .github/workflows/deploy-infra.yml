@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - infra
     paths:
     - 'bicep/**'
   workflow_dispatch:
