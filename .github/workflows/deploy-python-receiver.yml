@@ -1,6 +1,6 @@
 name: Trigger deployment of python-receiver application
 concurrency: 
-  group: ${{ github.head_ref || github.run_id }}
+  group: deployment
 
 on:
   push:
