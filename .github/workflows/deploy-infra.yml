@@ -6,7 +6,6 @@ on:
       - main
       - infra
     paths:
-    - '.github/**'
     - 'bicep/**'
   workflow_dispatch:
 
@@ -21,6 +20,20 @@ jobs:
       uses: azure/login@v1
       with:
        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: What-If Bicep file
+      uses: azure/arm-deploy@v1
+      with:
+       resourceGroupName: dapr-containerapps-rg
+       template: bicep/main.bicep
+       parameters: bicep/parameters/container-apps.json
+       additionalArguments: "--what-if"
+
+    - name: Approve deployment
+      uses: trstringer/manual-approval@v1
+      with:
+        secret: ${{ github.TOKEN }}
+        approvers: adamkielar
 
     - name: Deploy Bicep file
       uses: azure/arm-deploy@v1
