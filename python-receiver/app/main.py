@@ -39,6 +39,16 @@ async def save_planet(planet: Planet = Body(...)) -> int:
         )
         logging.info(f'Saving planets: {planet_data}')
     return response.status_code
+
+
+@app.get("/planets/{planet_name}")
+async def get_planet(planet_name: str) -> Dict:
+    async with ClientSession() as session:
+        response = await session.get(
+            url=f'http://localhost:3500/v1.0/state/statestore/{planet_name.capitalize()}'
+        )
+        logging.info(f'Retrieve planet: {planet_name}')
+    return await response.text()
 # @app.post("/orders")
 # async def save_order(order):
 #     orderId = '1'
