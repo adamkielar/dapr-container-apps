@@ -52,7 +52,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
           name: containerAppName
           resources: {
             cpu: 1
-            memory: '4.0Gi'
+            memory: '2.0Gi'
           }
           probes: [
             {
