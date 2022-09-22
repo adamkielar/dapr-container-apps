@@ -3,7 +3,7 @@ import logging
 import requests
 from typing import Dict
 
-from aiohttp import ClientSession
+from httpx import AsyncClient
 from fastapi import Body
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -36,23 +36,30 @@ async def save_planet(planet: Planet) -> int:
     #         url='http://localhost:3500/v1.0/state/statestore',
     #         json=data
     #     )
-    async with ClientSession() as session:
-        response = await session.post(
+    async with AsyncClient() as client:
+        response = await client.post(
             url='http://localhost:3500/v1.0/state/statestore',
             json=planet.dict()
         )
-    logging.info(f'Saving planets: {data}')
+    logging.info(f'Saving planets: {response.status_code}')
+
+    async with AsyncClient() as client:
+        response = await client.post(
+            url='http://localhost:3500/v1.0/state/statestore',
+            json=data
+        )
+    logging.info(f'Saving planets2: {response.status_code}')
     return response.status_code
 
 
 @app.get("/planets/{planet_name}")
 async def get_planet(planet_name: str) -> Dict:
-    async with ClientSession() as session:
-        response = await session.get(
+    async with AsyncClient() as client:
+        response = await client.get(
             url=f'http://localhost:3500/v1.0/state/statestore/{planet_name}'
         )
         logging.info(f'Retrieve planet: {planet_name}')
-    return await response.text()
+    return await response.json()
 # @app.post("/orders")
 # async def save_order(order):
 #     orderId = '1'
