@@ -1,4 +1,3 @@
-import json
 import logging
 
 from aiohttp import ClientSession
@@ -24,17 +23,17 @@ async def save_order(order: Order = Body()):
     async with ClientSession() as session:
         async with session.post(
             url='http://localhost:3500/v1.0/state/statestore',
-            data=order
+            json=order.json()
         ) as resp:
-            logging.info(f'Saving order {order}')
+            logging.info(f'Saving order {order.json()}')
     return await resp.text()
 
 
 @app.get("/orders/{order_id}")
-async def get_order(order_id):
+async def get_order(order_id: str):
     async with ClientSession() as session:
         async with session.get(
             url=f'http://localhost:3500/v1.0/state/statestore/{order_id}'
         ) as resp:
             logging.info(f'Retrieved order {order_id}')
-    return await resp.text()
+    return await resp.json()
