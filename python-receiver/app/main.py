@@ -27,7 +27,7 @@ async def save_order(order: Order = Body()):
             json=order.dict()
         ) as resp:
             logging.info(f'Saving order {order}')
-    return await resp.status
+    return {"Status code": resp.status}
 
 
 @app.get("/orders/{order_id}")
@@ -37,4 +37,4 @@ async def get_order(order_id):
             url=f'http://localhost:3500/v1.0/state/statestore/{order_id}'
         ) as resp:
             logging.info(f'Retrieved order {order_id}')
-    return await resp.json()
+    return await resp.text()
