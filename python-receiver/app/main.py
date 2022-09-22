@@ -19,19 +19,26 @@ def health_check():
 
 
 @app.post("/orders")
-async def save_order(order: Order = Body(...)):
+async def save_order():
+    orderId = '1'
+    order = {'orderId': orderId}
+    state = [{
+      'key': orderId,
+      'value': order
+    }]
     result = requests.post(
             url='http://localhost:3500/v1.0/state/statestore',
-            data=order.dict()
+            json=state
         )
-    logging.info(f'Saving order {order.json()}')
+    logging.info(f'Saving order {order}')
     return result.json()
 
 
-@app.get("/orders/{order_id}")
-async def get_order(order_id: str):
-    result = requests.get(
-            url=f'http://localhost:3500/v1.0/state/statestore/{order_id}'
-        )
-    logging.info(f'Retrieved order {order_id}')
-    return result.json()
+@app.get("/orders")
+async def get_order():
+    if result := requests.get(
+            url='http://localhost:3500/v1.0/state/statestore/1'
+    ):
+        logging.info(f'Retrieved order {result.json()}')
+        return result.json()
+    return result.status_code
