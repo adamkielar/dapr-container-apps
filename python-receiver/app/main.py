@@ -24,10 +24,10 @@ async def save_order(order: Order = Body()):
     async with ClientSession() as session:
         async with session.post(
             url='http://localhost:3500/v1.0/state/statestore',
-            json=order.dict()
+            data=order
         ) as resp:
             logging.info(f'Saving order {order}')
-    return {"Status code": resp.status}
+    return await resp.text()
 
 
 @app.get("/orders/{order_id}")
