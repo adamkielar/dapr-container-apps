@@ -30,7 +30,7 @@ def health_check():
 
 @app.post("/planets")
 async def save_planet(planet: Planet = Body(...)) -> int:
-    planet_data = json.dumps(planet.dict())
+    planet_data = json.dumps([planet.dict()])
 
     async with ClientSession() as session:
         response = await session.post(
