@@ -68,7 +68,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
                 ]
               }
               initialDelaySeconds: 7
-              periodSeconds: 3
+              periodSeconds: 5
             }
             {
               type: 'Readiness'
@@ -76,7 +76,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
                 port: containerPort
               }
               initialDelaySeconds: 10
-              periodSeconds: 3
+              periodSeconds: 5
             }
           ]
         }
