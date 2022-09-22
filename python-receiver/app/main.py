@@ -1,6 +1,6 @@
 import logging
+import requests
 
-from aiohttp import ClientSession
 from fastapi import Body, FastAPI
 from pydantic import BaseModel
 
@@ -19,21 +19,19 @@ def health_check():
 
 
 @app.post("/orders")
-async def save_order(order: Order = Body()):
-    async with ClientSession() as session:
-        async with session.post(
+async def save_order(order: Order = Body(...)):
+    result = requests.post(
             url='http://localhost:3500/v1.0/state/statestore',
-            json=order.json()
-        ) as resp:
-            logging.info(f'Saving order {order.json()}')
-    return await resp.text()
+            data=order.dict()
+        )
+    logging.info(f'Saving order {order.json()}')
+    return result.json()
 
 
 @app.get("/orders/{order_id}")
 async def get_order(order_id: str):
-    async with ClientSession() as session:
-        async with session.get(
+    result = requests.get(
             url=f'http://localhost:3500/v1.0/state/statestore/{order_id}'
-        ) as resp:
-            logging.info(f'Retrieved order {order_id}')
-    return await resp.json()
+        )
+    logging.info(f'Retrieved order {order_id}')
+    return result.json()
