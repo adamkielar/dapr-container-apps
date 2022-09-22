@@ -14,6 +14,7 @@ app = FastAPI()
 
 
 class PlanetDetails(BaseModel):
+    name: str
     kind: str
     status: str
 
@@ -43,7 +44,7 @@ async def save_planet(planet: Planet) -> int:
 async def get_planet(planet_name: str) -> Dict:
     async with ClientSession() as session:
         response = await session.get(
-            url=f'http://localhost:3500/v1.0/state/statestore/{planet_name.capitalize()}'
+            url=f'http://localhost:3500/v1.0/state/statestore/{planet_name}'
         )
         logging.info(f'Retrieve planet: {planet_name}')
     return await response.text()
