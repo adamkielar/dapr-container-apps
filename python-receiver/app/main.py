@@ -32,15 +32,15 @@ def health_check():
 @app.post("/planets")
 async def save_planet(planet: Planet) -> int:
     data = [planet.dict()]
-    response = requests.post(
-            url='http://localhost:3500/v1.0/state/statestore',
-            json=data
-        )
-    # async with ClientSession() as session:
-    #     response = await session.post(
-    #         url='http://localhost:3500/v1.0/state/statestore?metadata.contentType=application/json',
-    #         data=planet.dict()
+    # response = requests.post(
+    #         url='http://localhost:3500/v1.0/state/statestore',
+    #         json=data
     #     )
+    async with ClientSession() as session:
+        response = await session.post(
+            url='http://localhost:3500/v1.0/state/statestore',
+            json=planet.dict()
+        )
     logging.info(f'Saving planets: {data}')
     return response.status_code
 
