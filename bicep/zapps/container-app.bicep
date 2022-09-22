@@ -41,7 +41,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
       dapr: {
         enabled: true
         appPort: containerPort
-        appProtocol: 'grpc'
+        appProtocol: 'http'
         appId: containerAppName
       }
     }
@@ -52,7 +52,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
           name: containerAppName
           resources: {
             cpu: 1
-            memory: '2.0Gi'
+            memory: '4.0Gi'
           }
           probes: [
             {

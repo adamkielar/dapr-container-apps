@@ -8,4 +8,4 @@ services:
     volumes:
       - ./python-receiver:/usr/src/app
     ports:
-      - 8001:8000
+      - 8000:8000
