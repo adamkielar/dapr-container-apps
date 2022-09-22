@@ -27,6 +27,8 @@ async def save_order(order):
 @app.get("/orders/{order_id}")
 async def get_order(order_id):
     async with ClientSession() as session:
-        async with session.get(url=f'http://localhost:3500/v1.0/state/statestore/{order_id}') as resp:
+        async with session.get(
+            url=f'http://localhost:3500/v1.0/state/statestore/{order_id}'
+        ) as resp:
             logging.info(f'Retrieved order {order_id}')
     return await resp.json()

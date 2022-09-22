@@ -17,10 +17,6 @@ COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
 COPY . /usr/src/app/
-RUN pip install black==22.3.0 flake8==4.0.1 isort==5.10.1
-RUN flake8 .
-RUN black . --check --line-length 120
-RUN isort .
 
 #########
 # FINAL #
