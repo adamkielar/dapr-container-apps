@@ -66,7 +66,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01'
       componentType: 'state.redis'
       version: 'v1'
       ignoreErrors: false
-      initTimeout: '5s'
+      initTimeout: '1m'
       secrets: [
         {
           name: 'redis-cache-key'

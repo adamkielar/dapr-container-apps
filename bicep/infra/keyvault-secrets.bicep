@@ -40,7 +40,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
   resource secretRedisCacheHost 'secrets' = {
     name: 'redisCacheHost'
     properties: {
-      value: '${redisCache.name}.redis.cache.windows.net:6380'
+      value: '${redisCache.name}.redis.cache.windows.net:6379'
     }
   }
 }

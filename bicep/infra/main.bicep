@@ -147,7 +147,7 @@ resource redisCache 'Microsoft.Cache/redis@2022-05-01' = {
   name: '${projectName}-redis'
   location: location
   properties: {
-    enableNonSslPort: false
+    enableNonSslPort: true
     minimumTlsVersion: '1.2'
     publicNetworkAccess: 'Disabled'
     redisVersion: '6'
