@@ -55,4 +55,5 @@ RUN chown -R app:app $HOME
 
 USER app
 
+EXPOSE 6001
 CMD ["uvicorn", "app.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "6001"]
