@@ -2,6 +2,7 @@ param projectName string = 'dapr-containerapp'
 param acrServer string
 param containerAppName string
 param externalIngressEnabled bool = false
+param containerProbesEnabled bool = true
 param containerImage string
 param containerPort int
 param location string = resourceGroup().location
@@ -54,7 +55,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
             cpu: 1
             memory: '2.0Gi'
           }
-          probes: [
+          probes: containerProbesEnabled ? [
             {
               type: 'Liveness'
               httpGet: {
@@ -78,7 +79,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
               initialDelaySeconds: 10
               periodSeconds: 5
             }
-          ]
+          ] : []
         }
       ]
       scale: {

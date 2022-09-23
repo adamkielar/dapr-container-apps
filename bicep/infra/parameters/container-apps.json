@@ -6,7 +6,7 @@
       "value": "dapr-containerapp"
     },
     "serviceBusTopicName": {
-      "value": "orders"
+      "value": "planets"
     }
   }
 }
