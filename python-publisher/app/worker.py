@@ -42,6 +42,5 @@ class WorkerSettings:
     redis_settings = RedisSettings(
         host='dapr-containerapp-redis.redis.cache.windows.net', 
         port=6379,
-        password=os.getenv('redisPassword'),
-        ssl=True
+        password=os.getenv('redisPassword')
     )
