@@ -25,20 +25,14 @@ async def proces_planets(planet_data) -> None:
             json=planet_data
         )
     logging.info(f'Published: {planet_data}')
-    # with DaprClient() as client:
-    #     response = client.get_state(
-    #         store_name=DAPR_STORE_NAME,
-    #         key=planet
-    #     )
-    #     logging.info(f'Retrieve planet: {response.data}')
-
-    #     result = client.publish_event(
-    #         pubsub_name=DAPR_PUBSUB_NAME,
-    #         topic_name=DAPR_TOPIC,
-    #         data=response.data,
-    #         data_content_type='application/json'
-    #     )
-
+    with DaprClient() as client:
+        client.publish_event(
+            pubsub_name=DAPR_PUBSUB_NAME,
+            topic_name=DAPR_TOPIC,
+            data=json.dumps(planet_data).encode('utf-8'),
+            data_content_type='application/json'
+        )
+    logging.info(f'Published2')
 @app.post("/sdk/publisher")
 async def publish_message(planet_data: Dict, background_tasks: BackgroundTasks) -> Dict:
     background_tasks.add_task(proces_planets, planet_data)
