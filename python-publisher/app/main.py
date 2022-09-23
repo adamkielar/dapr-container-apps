@@ -23,7 +23,7 @@ async def proces_planets(planet_id: str) -> None:
         response = await client.get(
             url=f'http://localhost:3500/v1.0/state/{DAPR_STORE_NAME}/{planet_id}'
         )
-        logging.info(f'Retrieve planet: {response.json()}')
+        logging.info(f'Retrieve planet: {planet_id}')
 
     if response.json():
         async with AsyncClient() as client:
@@ -31,7 +31,7 @@ async def proces_planets(planet_id: str) -> None:
                 url=f'http://localhost:3500/v1.0/publish/{DAPR_PUBSUB_NAME}/{DAPR_TOPIC}',
                 json=response.json()
             )
-        logging.info(f'Published: {response.json()}')
+        logging.info(f'Published: {queue_response}')
     # with DaprClient() as client:
     #     response = client.get_state(
     #         store_name=DAPR_STORE_NAME,
