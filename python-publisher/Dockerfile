@@ -51,4 +51,4 @@ RUN chown -R app:app $HOME
 
 USER app
 
-CMD ["python", "app/worker.py"]
+CMD ["uvicorn", "app.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8001"]

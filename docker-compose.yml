@@ -9,3 +9,10 @@ services:
       - ./python-receiver:/usr/src/app
     ports:
       - 8000:8000
+  python-publisher:
+    build: ./python-publisher
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8001
+    volumes:
+      - ./python-receiver:/usr/src/app
+    ports:
+      - 8001:8001
