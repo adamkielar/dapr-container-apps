@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Dict, List
 
 from arq import cron
@@ -38,4 +39,9 @@ class WorkerSettings:
     cron_jobs = [
         cron(proces_planets, second=10)
     ]
-    redis_settings = RedisSettings(host='dapr-containerapp-redis.redis.cache.windows.net', port=6379)
+    redis_settings = RedisSettings(
+        host='dapr-containerapp-redis.redis.cache.windows.net', 
+        port=6379,
+        password=os.getenv('redisPassword'),
+        ssl=True
+    )
