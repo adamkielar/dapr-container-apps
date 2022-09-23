@@ -1,9 +1,10 @@
 import logging
-import os
+import schedule
+import time
+import threading
 from typing import Dict, List
 
-from arq import cron
-from arq.connections import RedisSettings
+
 from dapr.clients import DaprClient
 from dapr.clients.grpc.client import DaprResponse
 
@@ -14,7 +15,7 @@ DAPR_PUBSUB_NAME = "planetpubsub"
 DAPR_TOPIC = "planets"
 
 
-async def proces_planets():
+def proces_planets():
     with DaprClient() as client:
         response = client.query_state(
             store_name=DAPR_STORE_NAME,
@@ -35,12 +36,15 @@ async def proces_planets():
         for item in response.results:
             logging.info(f'Retrieve planet: {item}')
 
-class WorkerSettings:
-    cron_jobs = [
-        cron(proces_planets, second=10)
-    ]
-    redis_settings = RedisSettings(
-        host='dapr-containerapp-redis.redis.cache.windows.net', 
-        port=6379,
-        password=os.getenv('redisPassword')
-    )
+
+schedule.every(10).seconds.do(proces_planets)
+
+
+def scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+thread = threading.Thread(target=scheduler)
+thread.start()

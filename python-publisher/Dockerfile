@@ -51,4 +51,4 @@ RUN chown -R app:app $HOME
 
 USER app
 
-CMD ["arq", "app.worker.WorkerSettings"]
+CMD ["python", "app/worker.py"]
