@@ -54,7 +54,7 @@ async def get_planet(planet_id: str) -> Dict:
 
 
 @app.post("/sdk/planets")
-async def save_planet(planet: Planet) -> DaprResponse:
+async def save_planet_sdk(planet: Planet) -> DaprResponse:
     data = planet.dict()
     with DaprClient() as client:
         response = client.save_state(
@@ -67,7 +67,7 @@ async def save_planet(planet: Planet) -> DaprResponse:
 
 
 @app.get("/sdk/planets/{planet_id}")
-async def get_planet(planet_id: str) -> str:
+async def get_planet_sdk(planet_id: str) -> str:
     with DaprClient() as client:
         response = client.get_state(
             store_name=DAPR_STORE_NAME,
