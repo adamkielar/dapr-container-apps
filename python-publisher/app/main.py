@@ -21,7 +21,7 @@ def proces_planets(planet: str) -> None:
     with DaprClient() as client:
         response = client.get_state(
             store_name=DAPR_STORE_NAME,
-            keys=planet
+            key=planet
         )
         logging.info(f'Retrieve planet: {response.data}')
 
