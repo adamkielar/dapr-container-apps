@@ -2,6 +2,7 @@ import logging
 from typing import Dict, List
 
 from arq import cron
+from arq.connections import RedisSettings
 from dapr.clients import DaprClient
 from dapr.clients.grpc.client import DaprResponse
 
@@ -37,3 +38,4 @@ class WorkerSettings:
     cron_jobs = [
         cron(proces_planets, second=10)
     ]
+    redis_settings = RedisSettings(host='dapr-containerapp-redis.redis.cache.windows.net', port=6379)
