@@ -19,6 +19,7 @@ module containerApps 'container-app.bicep' = {
     projectName: projectName
     redisCacheKey: keyVault.getSecret('redisCacheKey')
     redisCacheHost: keyVault.getSecret('redisCacheHost')
+    serviceBusConnectionString: keyVault.getSecret('serviceBusConnectionString')
     acrServer: acrServer
     containerAppName: containerAppName
     externalIngressEnabled: externalIngressEnabled

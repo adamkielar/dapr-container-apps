@@ -11,6 +11,8 @@ param location string
 param redisCacheKey string
 @secure()
 param redisCacheHost string
+@secure()
+param serviceBusConnectionString string
 
 
 resource appIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' existing = {
@@ -41,6 +43,10 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
         {
           name: 'redis-cache-host'
           value: redisCacheHost
+        }
+        {
+          name: 'sb-root-connectionstring'
+          value: serviceBusConnectionString
         }
       ]
       registries: [
@@ -73,6 +79,10 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
             {
               name: 'redisPassword'
               secretRef: 'redis-cache-key'
+            }
+            {
+              name: 'connectionString'
+              secretRef: 'sb-root-connectionstring'
             }
           ]
           resources: {
