@@ -60,7 +60,7 @@ async def save_planet(planet: Planet) -> DaprResponse:
         response = client.save_state(
             store_name=DAPR_STORE_NAME,
             key=data.get('key'),
-            value=data.get('value')
+            value=str(data.get('value'))
         )
     logging.info(f'Saving planet: {data}')
     return response
