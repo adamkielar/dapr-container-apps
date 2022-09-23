@@ -18,20 +18,13 @@ DAPR_PUBSUB_NAME = "planetpubsub"
 DAPR_TOPIC = "planets"
 
 
-async def proces_planets(response) -> None:
-    data = response.json()
-    # async with AsyncClient() as client:
-    #     response = await client.get(
-    #         url=f'http://localhost:3500/v1.0/state/{DAPR_STORE_NAME}/{planet_id}'
-    #     )
-    #     logging.info(f'Retrieve planet: {planet_id}')
-
+async def proces_planets(planet_data) -> None:
     async with AsyncClient() as client:
         queue_response = await client.post(
             url=f'http://localhost:3500/v1.0/publish/{DAPR_PUBSUB_NAME}/{DAPR_TOPIC}',
-            json=data
+            json=planet_data
         )
-    logging.info(f'Published: {queue_response}')
+    logging.info(f'Published: {planet_data}')
     # with DaprClient() as client:
     #     response = client.get_state(
     #         store_name=DAPR_STORE_NAME,
@@ -46,13 +39,7 @@ async def proces_planets(response) -> None:
     #         data_content_type='application/json'
     #     )
 
-@app.post("/sdk/publisher/{planet_id}")
-async def publish_message(planet_id: str, background_tasks: BackgroundTasks) -> Dict:
-    async with AsyncClient() as client:
-        response = await client.get(
-            url=f'http://localhost:3500/v1.0/state/{DAPR_STORE_NAME}/{planet_id}'
-        )
-        logging.info(f'Retrieve planet: {response}')
-
-    background_tasks.add_task(proces_planets, response)
+@app.post("/sdk/publisher")
+async def publish_message(planet_data: Dict, background_tasks: BackgroundTasks) -> Dict:
+    background_tasks.add_task(proces_planets, planet_data)
     return {"status": "Work in progress"}
