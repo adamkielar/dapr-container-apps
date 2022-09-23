@@ -28,12 +28,6 @@ def proces_planets():
 
 schedule.every(30).seconds.do(proces_planets)
 
-
-def scheduler():
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-
-thread = threading.Thread(target=scheduler)
-thread.start()
+while True:
+    schedule.run_pending()
+    time.sleep(30)
