@@ -40,6 +40,16 @@ async def save_planet(planet: Planet) -> int:
             json=data
         )
     logging.info(f'Saving planet: {data}')
+
+    if response.status_code == 204:
+        planet_id = planet.dict().get('key')
+        async with AsyncClient() as client:
+            publisher_response = await client.post(
+                url=f'http://localhost:3500/sdk/publisher/{planet_id}',
+                headers={'dapr-app-id': 'python-publisher', 'content-type': 'application/json'}
+            )
+            return response.status_code, publisher_response.status_code
+
     return response.status_code
 
 
