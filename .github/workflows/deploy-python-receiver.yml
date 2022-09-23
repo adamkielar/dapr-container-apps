@@ -46,7 +46,7 @@ jobs:
         uses: azure/arm-deploy@v1
         with:
           resourceGroupName: dapr-containerapps-rg
-          template: bicep/zapps/container-app.bicep
+          template: bicep/zapps/main.bicep
           parameters: containerAppName=python-receiver containerImage=${{ secrets.ACR_SERVER }}/python-receiver:${{ github.sha }} acrServer=${{ secrets.ACR_SERVER }} containerPort=8000 externalIngressEnabled=true
 
       - name: Azure CLI script

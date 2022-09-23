@@ -1,11 +1,16 @@
-param projectName string = 'dapr-containerapp'
+param projectName string
 param acrServer string
 param containerAppName string
-param externalIngressEnabled bool = false
-param containerProbesEnabled bool = true
+param externalIngressEnabled bool
+param containerProbesEnabled bool
 param containerImage string
 param containerPort int
-param location string = resourceGroup().location
+param location string
+
+@secure()
+param redisCacheKey string
+@secure()
+param redisCacheHost string
 
 
 resource appIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' existing = {
@@ -15,7 +20,6 @@ resource appIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-3
 resource managedEnvironment 'Microsoft.App/managedEnvironments@2022-03-01' existing = {
   name: '${projectName}-env'
 }
-
 
 resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
@@ -29,6 +33,16 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   properties: {
     managedEnvironmentId: managedEnvironment.id
     configuration: {
+      secrets: [
+        {
+          name: 'redis-cache-key'
+          value: redisCacheKey
+        }
+        {
+          name: 'redis-cache-host'
+          value: redisCacheHost
+        }
+      ]
       registries: [
         {
           server: acrServer
@@ -51,6 +65,16 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
         {
           image: containerImage
           name: containerAppName
+          env: [
+            {
+              name: 'redisHost'
+              secretRef: 'redis-cache-host'
+            }
+            {
+              name: 'redisPassword'
+              secretRef: 'redis-cache-key'
+            }
+          ]
           resources: {
             cpu: 1
             memory: '2.0Gi'
