@@ -1,11 +1,11 @@
 name: Trigger deployment of container apps infrastructure
+concurrency: 
+  group: deployment
 
 on:
   push:
-    branches:
-      - main
     paths:
-    - 'bicep/**'
+    - 'bicep/infra/**'
     - '.github/workflows/deploy-infra.yml'
   workflow_dispatch:
 
@@ -25,22 +25,22 @@ jobs:
       uses: azure/arm-deploy@v1
       with:
        resourceGroupName: dapr-containerapps-rg
-       template: bicep/main.bicep
-       parameters: bicep/parameters/container-apps.json
+       template: bicep/infra/main.bicep
+       parameters: bicep/infra/parameters/container-apps.json
        additionalArguments: "--what-if"
 
-    - name: Approve deployment
-      uses: trstringer/manual-approval@v1
-      with:
-        secret: ${{ github.TOKEN }}
-        approvers: adamkielar
+    # - name: Approve deployment
+    #   uses: trstringer/manual-approval@v1
+    #   with:
+    #     secret: ${{ github.TOKEN }}
+    #     approvers: adamkielar
 
     - name: Deploy Bicep file
       uses: azure/arm-deploy@v1
       with:
        resourceGroupName: dapr-containerapps-rg
-       template: bicep/main.bicep
-       parameters: bicep/parameters/container-apps.json
+       template: bicep/infra/main.bicep
+       parameters: bicep/infra/parameters/container-apps.json
        additionalArguments: "--rollback-on-error"
 
     - name: Azure CLI cleanup

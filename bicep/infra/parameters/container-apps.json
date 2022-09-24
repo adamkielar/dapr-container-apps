@@ -6,7 +6,7 @@
       "value": "dapr-containerapp"
     },
     "serviceBusTopicName": {
-      "value": "checkout"
+      "value": "planets"
     }
   }
 }

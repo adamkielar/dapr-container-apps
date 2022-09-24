@@ -147,7 +147,7 @@ resource redisCache 'Microsoft.Cache/redis@2022-05-01' = {
   name: '${projectName}-redis'
   location: location
   properties: {
-    enableNonSslPort: false
+    enableNonSslPort: true
     minimumTlsVersion: '1.2'
     publicNetworkAccess: 'Disabled'
     redisVersion: '6'
@@ -180,17 +180,6 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
   }
   properties: {}
 
-  resource topic 'topics' = {
-    name: serviceBusTopicName
-    properties: {
-      maxSizeInMegabytes: 1024
-      defaultMessageTimeToLive: 'P10D'
-      supportOrdering: true
-      duplicateDetectionHistoryTimeWindow: 'P10D'
-      requiresDuplicateDetection: false
-    }
-  }
-
   resource sharedAccessKey 'AuthorizationRules' = {
     name: 'DefaultAuthorizationRule'
     properties: {
@@ -202,14 +191,35 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
   }
 }
 
+resource topic 'Microsoft.ServiceBus/namespaces/topics@2021-11-01' = {
+  parent: serviceBusNamespace
+  name: serviceBusTopicName
+  properties: {
+    maxSizeInMegabytes: 1024
+    supportOrdering: true
+    duplicateDetectionHistoryTimeWindow: 'PT10M'
+    requiresDuplicateDetection: false
+  }
+  resource subs 'subscriptions' = {
+    name: '${serviceBusTopicName}-sub'
+    properties: {}
+  }
+}
+
 // ============== //
 // Container App Environment
 // ============== //
 
 module containerAppsEnvironment 'environment.bicep' = {
+  dependsOn: [
+    secrets
+  ]
   name: '${_deployment}-env'
   params: {
     projectName: projectName
+    redisCacheKey: keyVault.getSecret('redisCacheKey')
+    redisCacheHost: keyVault.getSecret('redisCacheHost')
+    serviceBusConnectionString: keyVault.getSecret('serviceBusConnectionString')
     location: location
     vnet: {
       infrastructureSubnetId: vnetSubnets['infrastructure-snet']

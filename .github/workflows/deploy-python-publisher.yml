@@ -1,0 +1,59 @@
+name: Trigger deployment of python-publisher application
+concurrency: 
+  group: deployment
+
+on:
+  push:
+    paths:
+    - 'python-publisher/**'
+    - '.github/workflows/deploy-python-publisher.yml'
+  workflow_dispatch:
+   
+jobs:
+  build-and-push-to-acr:
+    runs-on: ubuntu-22.04
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v1
+
+        - name: Azure Login
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+        - name: Push image to ACR
+          uses: azure/CLI@v1
+          with:
+            inlineScript: |
+              az acr build -t python-publisher:${{ github.sha }} -r ${{ secrets.ACR_SERVER }} python-publisher
+
+  deploy-container-app:
+    runs-on: ubuntu-22.04
+    needs: build-and-push-to-acr
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Container App
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: dapr-containerapps-rg
+          template: bicep/zapps/main.bicep
+          parameters: containerAppName=python-publisher containerImage=${{ secrets.ACR_SERVER }}/python-publisher:${{ github.sha }} acrServer=${{ secrets.ACR_SERVER }} containerPort=8001 externalIngressEnabled=false containerProbesEnabled=true
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az logout
+            az cache purge
+            az account clear
+     

@@ -1,0 +1,6 @@
+dapr==1.7.0
+dapr-ext-fastapi==1.7.0
+fastapi==0.85.0
+httpx==0.23.0
+requests==2.28.1
+uvicorn[standard]==0.18.3

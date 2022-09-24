@@ -37,10 +37,10 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
       value: redisCache.listKeys().primaryKey
     }
   }
-  resource secretRedisCacheConnectionString 'secrets' = {
-    name: 'redisCacheConnectionString'
+  resource secretRedisCacheHost 'secrets' = {
+    name: 'redisCacheHost'
     properties: {
-      value: '${redisCache.name}.redis.cache.windows.net:6380,password=${redisCache.listKeys().primaryKey},ssl=True,abortConnect=False'
+      value: '${redisCache.name}.redis.cache.windows.net:6379'
     }
   }
 }
