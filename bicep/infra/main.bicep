@@ -201,7 +201,7 @@ resource topic 'Microsoft.ServiceBus/namespaces/topics@2021-11-01' = {
     requiresDuplicateDetection: false
   }
   resource subs 'subscriptions' = {
-    name: '${serviceBusTopicName}-sub'
+    name: serviceBusTopicName
     properties: {}
   }
 }

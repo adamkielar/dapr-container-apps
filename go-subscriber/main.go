@@ -1,52 +1,81 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/dapr/go-sdk/service/common"
-	daprd "github.com/dapr/go-sdk/service/grpc"
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 )
 
-type healthcheck struct {
-	Message string `json:"message"`
+type JSONObj struct {
+	PubsubName string `json:"pubsubName"`
+	Topic      string `json:"topic"`
+	Route      string `json:"route"`
 }
 
-var healthchecks = []healthcheck{
-	{Message: "Go subscriber is healthy!"},
+type Result struct {
+	Data string `json:"data"`
 }
 
-var sub = &common.Subscription{
-	PubsubName: "planetpubsub",
-	Topic:      "planets",
+func getOrder(w http.ResponseWriter, r *http.Request) {
+	jsonData := []JSONObj{
+		{
+			PubsubName: "orderpubsub",
+			Topic:      "planets",
+			Route:      "planets",
+		},
+	}
+	jsonBytes, err := json.Marshal(jsonData)
+	if err != nil {
+		log.Fatal("Error in reading the result obj")
+	}
+	_, err = w.Write(jsonBytes)
+	if err != nil {
+		log.Fatal("Error in writing the result obj")
+	}
+}
+
+func postOrder(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var result Result
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Subscriber received: ", string(result.Data))
+	obj, err := json.Marshal(data)
+	if err != nil {
+		log.Fatal("Error in reading the result obj")
+	}
+	_, err = w.Write(obj)
+	if err != nil {
+		log.Fatal("Error in writing the result obj")
+	}
+}
+
+func healthCheck(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Alive!\n"))
 }
 
 func main() {
-	router := gin.Default()
-	router.GET("/health", healthCheck)
+	appPort := "8002"
 
-	router.Run("0.0.0.0:8002")
+	r := mux.NewRouter()
 
-	service, err := daprd.NewService(":50002")
-	if err != nil {
-		log.Fatalf("Failed to start the server: %v", err)
+	r.HandleFunc("/dapr/subscribe", getOrder).Methods("GET")
+
+	r.HandleFunc("/planets", postOrder).Methods("POST")
+
+	r.HandleFunc("/health", healthCheck).Methods("GET")
+
+	if err := http.ListenAndServe(":"+appPort, r); err != nil {
+		log.Panic(err)
 	}
-	if err := service.AddTopicEventHandler(sub, eventHandler); err != nil {
-		log.Fatalf("Error adding topic subscription: %v", err)
-	}
-	if err := service.Start(); err != nil {
-		log.Fatalf("Server error: %v", err)
-	}
-}
-
-func eventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
-	fmt.Printf("Event - PubsubName:%s, Topic:%s, ID:%s, Data: %v", e.PubsubName, e.Topic, e.ID, e.Data)
-	return true, nil
-}
-
-func healthCheck(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, healthchecks)
 }
