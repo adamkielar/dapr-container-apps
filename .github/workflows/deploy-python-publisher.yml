@@ -47,7 +47,7 @@ jobs:
         with:
           resourceGroupName: dapr-containerapps-rg
           template: bicep/zapps/main.bicep
-          parameters: containerAppName=python-publisher containerImage=${{ secrets.ACR_SERVER }}/python-publisher:${{ github.sha }} acrServer=${{ secrets.ACR_SERVER }} containerPort=8001 externalIngressEnabled=false containerProbesEnabled=false
+          parameters: containerAppName=python-publisher containerImage=${{ secrets.ACR_SERVER }}/python-publisher:${{ github.sha }} acrServer=${{ secrets.ACR_SERVER }} containerPort=8001 externalIngressEnabled=false containerProbesEnabled=true
 
       - name: Azure CLI script
         uses: azure/CLI@v1
