@@ -16,3 +16,11 @@ services:
       - ./python-receiver:/usr/src/app
     ports:
       - 8001:8001
+
+  go-subscriber:
+    build: ./go-subscriber
+    command: ./go-subscriber
+    volumes:
+      - ./go-subscriber:/usr/src/app
+    ports:
+      - 8002:8002

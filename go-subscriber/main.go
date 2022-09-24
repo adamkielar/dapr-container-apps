@@ -60,6 +60,7 @@ func postOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Alive!")
 	w.Write([]byte("Alive!\n"))
 }
 
