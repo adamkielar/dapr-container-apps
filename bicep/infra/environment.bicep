@@ -2,6 +2,7 @@ param projectName string
 param location string
 param pythonReceiverApp string = 'python-receiver'
 param pythonPublisherApp string = 'python-publisher'
+param goSubscriberApp string = 'go-subscriber'
 param logName string = '${projectName}-logs'
 param envName string = '${projectName}-env'
 param appInsightsName string = '${projectName}-ai'
@@ -119,6 +120,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01'
       ]
       scopes: [
         pythonPublisherApp
+        goSubscriberApp
       ]
     }
   }
