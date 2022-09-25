@@ -16,8 +16,20 @@ type JSONObj struct {
 	Route      string `json:"route"`
 }
 
+type Value struct {
+	Kind string
+	Name string
+	Status string
+}
+
+type Data struct {
+	Key string
+	Value Value
+
+}
+
 type Result struct {
-	Data string `json:"data"`
+	Data Data
 }
 
 func getOrder(w http.ResponseWriter, r *http.Request) {
@@ -44,11 +56,11 @@ func postOrder(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	var result Result
-	err = json.Unmarshal(data, &result)
+	err = json.Unmarshal([]byte(data), &result)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Subscriber received: ", string(result.Data))
+	fmt.Println("Subscriber received: ", result.Data)
 	obj, err := json.Marshal(data)
 	if err != nil {
 		log.Fatal("Error in reading the result obj")
