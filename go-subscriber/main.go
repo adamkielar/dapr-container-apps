@@ -1,34 +1,74 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
-	"github.com/dapr/go-sdk/service/common"
-	daprd "github.com/dapr/go-sdk/service/http"
+	"github.com/gorilla/mux"
 )
 
-var sub = &common.Subscription{
-	PubsubName: "planetpubsub",
-	Topic:      "planets",
-	Route:      "/planets",
+type JSONObj struct {
+	PubsubName string `json:"pubsubName"`
+	Topic      string `json:"topic"`
+	Route      string `json:"route"`
+}
+
+type Result struct {
+	Data string `json:"data"`
+}
+
+func getOrder(w http.ResponseWriter, r *http.Request) {
+	jsonData := []JSONObj{
+		{
+			PubsubName: "planetpubsub",
+			Topic:      "planets",
+			Route:      "planets",
+		},
+	}
+	jsonBytes, err := json.Marshal(jsonData)
+	if err != nil {
+		log.Fatal("Error in reading the result obj")
+	}
+	_, err = w.Write(jsonBytes)
+	if err != nil {
+		log.Fatal("Error in writing the result obj")
+	}
+}
+
+func postOrder(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var result Result
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Subscriber received: ", string(result.Data))
+	obj, err := json.Marshal(data)
+	if err != nil {
+		log.Fatal("Error in reading the result obj")
+	}
+	_, err = w.Write(obj)
+	if err != nil {
+		log.Fatal("Error in writing the result obj")
+	}
 }
 
 func main() {
 	appPort := "8002"
 
-	s := daprd.NewService(":" + appPort)
-	if err := s.AddTopicEventHandler(sub, eventHandler); err != nil {
-		log.Fatalf("error adding topic subscription: %v", err)
-	}
-	if err := s.Start(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("error listenning: %v", err)
-	}
-}
+	r := mux.NewRouter()
 
-func eventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
-	fmt.Println("Subscriber received: ", e.Data)
-	return false, nil
+	r.HandleFunc("/dapr/subscribe", getOrder).Methods("GET")
+
+	r.HandleFunc("/planets", postOrder).Methods("POST")
+
+	if err := http.ListenAndServe(":"+appPort, r); err != nil {
+		log.Panic(err)
+	}
 }
