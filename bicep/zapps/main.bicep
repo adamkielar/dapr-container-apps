@@ -5,6 +5,7 @@ param externalIngressEnabled bool = false
 param containerProbesEnabled bool = true
 param containerImage string
 param containerPort int
+param appProtocol string = 'http'
 param location string = resourceGroup().location
 
 var _deployment = deployment().name
@@ -26,6 +27,7 @@ module containerApps 'container-app.bicep' = {
     containerProbesEnabled: containerProbesEnabled
     containerImage: containerImage
     containerPort: containerPort
+    appProtocol: appProtocol
     location: location
   }
 }

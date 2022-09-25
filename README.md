@@ -13,3 +13,5 @@ Table of Contents
 ![diagram](docs/diagram.png)
 
 ## Application diagram
+
+![app-diagram](docs/dapr-app.png)

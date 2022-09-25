@@ -184,6 +184,7 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
     name: 'DefaultAuthorizationRule'
     properties: {
       rights: [
+        'Manage'
         'Listen'
         'Send'
       ]
@@ -199,10 +200,6 @@ resource topic 'Microsoft.ServiceBus/namespaces/topics@2021-11-01' = {
     supportOrdering: true
     duplicateDetectionHistoryTimeWindow: 'PT10M'
     requiresDuplicateDetection: false
-  }
-  resource subs 'subscriptions' = {
-    name: '${serviceBusTopicName}-sub'
-    properties: {}
   }
 }
 

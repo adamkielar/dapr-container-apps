@@ -5,6 +5,7 @@ param externalIngressEnabled bool
 param containerProbesEnabled bool
 param containerImage string
 param containerPort int
+param appProtocol string
 param location string
 
 @secure()
@@ -62,7 +63,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
       dapr: {
         enabled: true
         appPort: containerPort
-        appProtocol: 'http'
+        appProtocol: appProtocol
         appId: containerAppName
       }
     }
