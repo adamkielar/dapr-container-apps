@@ -1,62 +1,35 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/gorilla/mux"
+	"github.com/dapr/go-sdk/service/common"
+	daprd "github.com/dapr/go-sdk/service/http"
 )
 
-const appPort = 8002
-
-type subscription struct {
-	PubsubName string            `json:"pubsubname"`
-	Topic      string            `json:"topic"`
-	Metadata   map[string]string `json:"metadata,omitempty"`
-	Routes     routes            `json:"routes"`
-}
-
-type routes struct {
-	Rules   []rule `json:"rules,omitempty"`
-	Default string `json:"default,omitempty"`
-}
-
-type rule struct {
-	Match string `json:"match"`
-	Path  string `json:"path"`
-}
-
-func healthCheck(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Alive!")
-	w.Write([]byte("Alive!\n"))
-}
-
-func configureSubscribeHandler(w http.ResponseWriter, _ *http.Request) {
-	t := []subscription{
-		{
-			PubsubName: "planetpubsub",
-			Topic:      "planets",
-			Routes: routes{
-				Rules: []rule{
-					{
-						Match: `event.type == "planet"`,
-						Path:  "/planets",
-					},
-				},
-				Default: "/planets",
-			},
-		},
-	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(t)
+var sub = &common.Subscription{
+	PubsubName: "planetpubsub",
+	Topic:      "planets",
+	Route:      "/planets",
 }
 
 func main() {
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/dapr/subscribe", configureSubscribeHandler).Methods("GET")
-	router.HandleFunc("/health", healthCheck).Methods("GET")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", appPort), router))
+	appPort := "8002"
+
+	s := daprd.NewService(":" + appPort)
+	if err := s.AddTopicEventHandler(sub, eventHandler); err != nil {
+		log.Fatalf("error adding topic subscription: %v", err)
+	}
+	if err := s.Start(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("error listenning: %v", err)
+	}
+}
+
+func eventHandler(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
+	fmt.Println("Subscriber received: ", e.Data)
+	return false, nil
 }
