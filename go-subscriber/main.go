@@ -3,60 +3,29 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
-type JSONObj struct {
-	PubsubName string `json:"pubsubName"`
-	Topic      string `json:"topic"`
-	Route      string `json:"route"`
+const appPort = 8002
+
+type subscription struct {
+	PubsubName string            `json:"pubsubname"`
+	Topic      string            `json:"topic"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
+	Routes     routes            `json:"routes"`
 }
 
-type Result struct {
-	Data string `json:"data"`
+type routes struct {
+	Rules   []rule `json:"rules,omitempty"`
+	Default string `json:"default,omitempty"`
 }
 
-func getOrder(w http.ResponseWriter, r *http.Request) {
-	jsonData := []JSONObj{
-		{
-			PubsubName: "orderpubsub",
-			Topic:      "planets",
-			Route:      "planets",
-		},
-	}
-	jsonBytes, err := json.Marshal(jsonData)
-	if err != nil {
-		log.Fatal("Error in reading the result obj")
-	}
-	_, err = w.Write(jsonBytes)
-	if err != nil {
-		log.Fatal("Error in writing the result obj")
-	}
-}
-
-func postOrder(w http.ResponseWriter, r *http.Request) {
-	data, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var result Result
-	err = json.Unmarshal(data, &result)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Subscriber received: ", string(result.Data))
-	obj, err := json.Marshal(data)
-	if err != nil {
-		log.Fatal("Error in reading the result obj")
-	}
-	_, err = w.Write(obj)
-	if err != nil {
-		log.Fatal("Error in writing the result obj")
-	}
+type rule struct {
+	Match string `json:"match"`
+	Path  string `json:"path"`
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
@@ -64,18 +33,30 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Alive!\n"))
 }
 
-func main() {
-	appPort := "8002"
-
-	r := mux.NewRouter()
-
-	r.HandleFunc("/dapr/subscribe", getOrder).Methods("GET")
-
-	r.HandleFunc("/planets", postOrder).Methods("POST")
-
-	r.HandleFunc("/health", healthCheck).Methods("GET")
-
-	if err := http.ListenAndServe(":"+appPort, r); err != nil {
-		log.Panic(err)
+func configureSubscribeHandler(w http.ResponseWriter, _ *http.Request) {
+	t := []subscription{
+		{
+			PubsubName: "planetpubsub",
+			Topic:      "planets",
+			Routes: routes{
+				Rules: []rule{
+					{
+						Match: `event.type == "planet"`,
+						Path:  "/planets",
+					},
+				},
+				Default: "/planets",
+			},
+		},
 	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(t)
+}
+
+func main() {
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/dapr/subscribe", configureSubscribeHandler).Methods("GET")
+	router.HandleFunc("/health", healthCheck).Methods("GET")
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", appPort), router))
 }

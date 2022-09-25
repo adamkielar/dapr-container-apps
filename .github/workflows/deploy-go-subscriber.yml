@@ -47,7 +47,7 @@ jobs:
         with:
           resourceGroupName: dapr-containerapps-rg
           template: bicep/zapps/main.bicep
-          parameters: containerAppName=go-subscriber containerImage=${{ secrets.ACR_SERVER }}/go-subscriber:${{ github.sha }} acrServer=${{ secrets.ACR_SERVER }} containerPort=8002 externalIngressEnabled=false containerProbesEnabled=true
+          parameters: containerAppName=go-subscriber containerImage=${{ secrets.ACR_SERVER }}/go-subscriber:${{ github.sha }} acrServer=${{ secrets.ACR_SERVER }} containerPort=8002 externalIngressEnabled=false containerProbesEnabled=true appProtocol=grpc
 
       - name: Azure CLI script
         uses: azure/CLI@v1
