@@ -41,7 +41,7 @@ jobs:
        resourceGroupName: dapr-containerapps-rg
        template: bicep/infra/main.bicep
        parameters: bicep/infra/parameters/container-apps.json
-      #  additionalArguments: "--rollback-on-error"
+       additionalArguments: "--rollback-on-error"
 
     - name: Azure CLI cleanup
       uses: azure/CLI@v1
